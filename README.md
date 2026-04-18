@@ -13,12 +13,12 @@
 wget https://buildroot.org/downloads/buildroot-2026.02.tar.xz
 tar xf buildroot-2026.02.tar.xz
 
-# Path to dir with my buildroot configs, root overlay, packages, etc.
+# Path to dir with buildroot configs, root overlay, packages, etc.
 export BR2_EXTERNAL=$PWD/buildroot
 
-# Load config from external
+# Load buildroot config
 make j49_defconfig
-# Save changes to config
+# Save changes to buildroot config
 make savedefconfig BR2_DEFCONFIG=../buildroot/configs/j49_defconfig
 
 # Open BusyBox config
