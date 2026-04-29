@@ -1,0 +1,13 @@
+--- a/drivers/net/wireless/wl12xx/Makefile	2026-04-24 00:48:50.331289582 -0400
++++ b/drivers/net/wireless/wl12xx/Makefile	2026-04-24 00:49:05.578469510 -0400
+@@ -7,8 +7,8 @@
+ 			"$(shell git describe --dirty)";')
+ endef
+ 
+-$(obj)/version.h: .git/HEAD .git/index .git/refs/tags
+-	@$(call filechk,version.h)
++# $(obj)/version.h: .git/HEAD .git/index .git/refs/tags
++# 	@$(call filechk,version.h)
+ 
+ $(obj)/main.c: $(src)/version.h
+ 

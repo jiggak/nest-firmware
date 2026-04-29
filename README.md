@@ -6,12 +6,21 @@
 * libc 2.19
 * gcc 4.8.2
 
+# TI AM3703
+
+* https://www.ti.com/product/AM3703#software-development
+* am37x-evm-sdk-src-06.00.00.00.tar.gz
+* SDK code likely used by Nest when developing firmware
+
 # Buildroot Hacking
 
 ```console
 # Get buildroot source
 wget https://buildroot.org/downloads/buildroot-2026.02.tar.xz
 tar xf buildroot-2026.02.tar.xz
+
+# https://buildroot.org/downloads/buildroot-2015.11.1.tar.bz2
+# Last version before iptables updated from 1.4.21 to 1.6
 
 # Path to dir with buildroot configs, root overlay, packages, etc.
 export BR2_EXTERNAL=$PWD/buildroot
@@ -23,8 +32,15 @@ make savedefconfig BR2_DEFCONFIG=../buildroot/configs/j49_defconfig
 
 # Open BusyBox config
 make busybox-menuconfig
-# Save changes to BusyBox config
+# Save changes to BR2_PACKAGE_BUSYBOX_CONFIG
 make busybox-update-config
+
+# Open Linux menuconfig, extra flags to get past lxdialog-check error
+make HOST_EXTRACFLAGS=-Wno-implicit-int linux-menuconfig
+# Save defconfig to BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE
+make linux-update-defconfig
+# Save .config to BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE
+make linux-update-config
 
 # Setting job number to speed up builds
 make BR2_JLEVEL=16
@@ -73,4 +89,38 @@ modprobe mtdblock
 # Write image and mount
 dd if=backups/root_rooted.jffs2 of=/dev/mtdblock0
 mount -t jffs2 /dev/mtdblock0 /mnt/nest/
+```
+
+# crosstool-ng 1.21.0 hacks
+
+`kconfig/zconf.hash.c:41`
+
+Change `unsigned` arg type to `size_t`
+
+```
+static struct kconf_id *kconf_id_lookup(register const char *str, register size_t len);
+```
+
+---
+
+Fix invalid download link
+
+`scripts/build/companion_libs/120-ppl.sh:15`
+
+```
+    CT_GetFile "ppl-${CT_PPL_VERSION}" .tar.gz \
+        https://support.bugseng.com/ppl/download/ftp/releases/${CT_PPL_VERSION} \
+```
+
+---
+
+During build, cloog-ppl will fail with autoconf version missmatch.
+Re-gen autoconf stuff and resume build.
+
+```
+cd .build/src/cloog-ppl-0.15.11
+	libtoolize --force
+	aclocal
+	autoconf
+	automake --add-missing
 ```

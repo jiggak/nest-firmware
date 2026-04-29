@@ -1,0 +1,7 @@
+config BR2_PACKAGE_TI_WL12XX_COMPAT
+	bool "wl12xx TI compat-wireless drivers"
+	depends on BR2_LINUX_KERNEL
+	select BR2_PACKAGE_TI_WL12XX_DRIVER
+	select BR2_PACKAGE_TI_COMPAT
+	help
+	  Builds wl12xx out-of-tree drivers from TI-OpenLink repos.

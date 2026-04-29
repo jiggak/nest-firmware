@@ -1,0 +1,5 @@
+source "$BR2_EXTERNAL_NEST_PATH/package/connman-legacy/Config.in"
+source "$BR2_EXTERNAL_NEST_PATH/package/iptables-legacy/Config.in"
+source "$BR2_EXTERNAL_NEST_PATH/package/ti-compat/Config.in"
+source "$BR2_EXTERNAL_NEST_PATH/package/ti-wl12xx-compat/Config.in"
+source "$BR2_EXTERNAL_NEST_PATH/package/ti-wl12xx-driver/Config.in"

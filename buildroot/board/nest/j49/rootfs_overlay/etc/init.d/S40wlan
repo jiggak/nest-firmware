@@ -1,0 +1,33 @@
+#!/bin/sh
+
+start() {
+    # ensure NVS symlink exists (i.e. mount is ready)
+    [ -e /lib/firmware/ti-connectivity/wl1271-nvs.bin ] || {
+        echo "NVS not ready, skipping"
+        return
+    }
+
+    modprobe -a wl12xx wl12xx_sdio
+    [ $? -eq 0 ] && echo "OK" || echo "ERROR"
+}
+
+stop() {
+    echo -n "Stopping wl12xx... "
+    modprobe -r wl12xx_sdio wl12xx
+    [ $? -eq 0 ] && echo "OK" || echo "ERROR"
+}
+
+case "$1" in
+    start|stop)
+        "$1"
+        ;;
+    restart)
+        "$0" stop
+        "$0" start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?

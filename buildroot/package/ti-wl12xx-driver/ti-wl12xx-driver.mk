@@ -1,0 +1,14 @@
+TI_WL12XX_DRIVER_VERSION = ol_R5.SP4.01
+TI_WL12XX_DRIVER_SITE = https://github.com/TI-OpenLink/wl12xx
+TI_WL12XX_DRIVER_SITE_METHOD = git
+TI_WL12XX_DRIVER_LICENSE = GPL-2.0
+
+define TI_WL12XX_DRIVER_BUILD_CMDS
+	@true
+endef
+
+define TI_WL12XX_DRIVER_INSTALL_TARGET_CMDS
+	@true
+endef
+
+$(eval $(generic-package))
