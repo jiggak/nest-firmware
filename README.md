@@ -48,9 +48,39 @@ make BR2_JLEVEL=16
 
 # Toolchain
 
-ct-ng savedefconfig DEFCONFIG=my-custom-config
+Use `toolchain/make.sh` to build a toolchain with crosstool-ng in docker.
+
+```console
+# Load configuration
 ct-ng defconfig DEFCONFIG=my-custom-config
-CT_PREFIX=~/Toolchains/foo
+# Save configuration
+ct-ng savedefconfig DEFCONFIG=my-custom-config
+# Build and output to $TOOLCHAINS dir
+# CT_PREFIX_DIR="${TOOLCHAINS}/${CT_TARGET}"
+TOOLCHAINS=~/Toolchains ct-ng build
+```
+
+# Boot with omap_loader
+
+```console
+# Boot with initramfs inside kernel
+./omap_loader -f x-load.bin \
+   -f u-boot.bin -a 0x80100000 \
+   -f uImage -a 0x80A00000 \
+   -v -j 0x80100000
+
+# Boot with initrd, separate rootfs image
+# (fixes relocation errors loading modules; when initramfs grows large)
+./omap_loader \
+   -f x-load.bin \
+   -f u-boot.bin -a 0x80100000 \
+   -f buildroot-2026.02/output/images/uImage -a 0x80A00000 \
+   -f buildroot-2026.02/output/images/rootfs.cpio.uboot -a 0x82000000 \
+   -v -j 0x80100000
+
+setenv bootargs console=ttyO0,115200 rdinit=/sbin/init nlmodel=Display-2.0
+bootm 0x80A00000 0x82000000
+```
 
 # Misc saved commands
 
@@ -66,12 +96,6 @@ make ARCH=arm CROSS_COMPILE=arm-unknown-linux-gnueabi-
 # Build linux
 make ARCH=arm distclean gtvhacker_defconfig
 make ARCH=arm CROSS_COMPILE=arm-unknown-linux-gnueabi- uImage
-
-# Booting with DFU
-./omap_loader -f x-load.bin \
-   -f u-boot.bin -a 0x80100000 \
-   -f uImage -a 0x80A00000 \
-   -v -j 0x80100000
 ```
 
 # Dump and view rootfs from device flash
@@ -124,3 +148,10 @@ cd .build/src/cloog-ppl-0.15.11
 	autoconf
 	automake --add-missing
 ```
+
+# crosstool-ng 1.22.0 hacks
+
+`scripts/build/companion_libs/121-isl.sh:17`
+
+Fix invalid URL:
+   "http://isl.gforge.inria.fr" => "https://libisl.sourceforge.io"
