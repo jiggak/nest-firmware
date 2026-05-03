@@ -1,0 +1,21 @@
+config BR2_PACKAGE_CONNMAN_NEST
+	bool "connman-nest"
+	select BR2_PACKAGE_DBUS
+	select BR2_PACKAGE_LIBGLIB2
+	select BR2_PACKAGE_IPTABLES_LEGACY
+	select BR2_PACKAGE_READLINE
+	depends on BR2_USE_WCHAR # libglib2
+	depends on BR2_TOOLCHAIN_HAS_THREADS # dbus, libglib2
+	depends on BR2_USE_MMU # dbus, libglib2
+	depends on !BR2_STATIC_LIBS # needs dlopen()
+	help
+	  The Connection Manager (ConnMan) project provides a daemon
+	  for managing internet connections within embedded devices
+	  running the Linux operating system.
+
+	  Built from Nest Thermostat repo
+	  https://nest-open-source.googlesource.com/nest-learning-thermostat/5.9.4/connman
+
+comment "connman needs a toolchain w/ wchar, threads, resolver, dynamic library"
+	depends on BR2_USE_MMU
+	depends on !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS || BR2_STATIC_LIBS
