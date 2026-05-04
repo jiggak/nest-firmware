@@ -1,6 +1,8 @@
 #!/bin/sh
 
 start() {
+    echo -n "Starting wl12xx... "
+
     # ensure NVS symlink exists (i.e. mount is ready)
     [ -e /lib/firmware/ti-connectivity/wl1271-nvs.bin ] || {
         echo "NVS not ready, skipping"

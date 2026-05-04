@@ -78,7 +78,7 @@ TOOLCHAINS=~/Toolchains ct-ng build
    -f buildroot-2026.02/output/images/rootfs.cpio.uboot -a 0x82000000 \
    -v -j 0x80100000
 
-setenv bootargs console=ttyO0,115200 rdinit=/sbin/init nlmodel=Display-2.0
+setenv bootargs console=ttyO0,115200 rdinit=/sbin/init nlmodel=Display-2.14
 bootm 0x80A00000 0x82000000
 ```
 
