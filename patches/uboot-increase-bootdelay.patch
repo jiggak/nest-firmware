@@ -1,0 +1,15 @@
+diff --git a/u-boot/include/configs/diamond.h b/u-boot/include/configs/diamond.h
+index 7a9a3f4..62ff5d7 100644
+--- a/u-boot/include/configs/diamond.h
++++ b/u-boot/include/configs/diamond.h
+@@ -643,8 +643,8 @@
+     #define CONFIG_BOOTDELAY				0
+     #define CONFIG_BOOTDELAY_STR            "0"
+ #else
+-    #define CONFIG_BOOTDELAY				1
+-    #define CONFIG_BOOTDELAY_STR            "1"
++    #define CONFIG_BOOTDELAY				5
++    #define CONFIG_BOOTDELAY_STR            "5"
+ #endif
+ 
+ 

@@ -1,0 +1,13 @@
+diff --git a/linux/drivers/usb/gadget/composite.c b/linux/drivers/usb/gadget/composite.c
+index 1d3fcd6c..f22f6bc6 100644
+--- a/linux/drivers/usb/gadget/composite.c
++++ b/linux/drivers/usb/gadget/composite.c
+@@ -25,6 +25,8 @@
+ #include <linux/slab.h>
+ #include <linux/device.h>
+ #include <linux/utsname.h>
++#include <linux/delay.h>
++#include <linux/kdev_t.h>
+ 
+ #include <linux/usb/composite.h>
+ 

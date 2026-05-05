@@ -1,0 +1,12 @@
+[submodule "x-loader"]
+	path = x-loader
+	url = https://nest-open-source.googlesource.com/nest-learning-thermostat/5.9.4/x-loader
+[submodule "u-boot"]
+	path = u-boot
+	url = https://nest-open-source.googlesource.com/nest-learning-thermostat/5.9.4/u-boot
+[submodule "linux"]
+	path = linux
+	url = https://nest-open-source.googlesource.com/nest-learning-thermostat/5.9.4/linux
+[submodule "omap_loader"]
+	path = omap_loader
+	url = https://github.com/ajb142/omap_loader.git

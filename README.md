@@ -1,7 +1,8 @@
 # Nest OEM Details
 
-* https://nest-open-source.googlesource.com/nest-learning-thermostat/5.9.4/u-boot
 * https://nest-open-source.googlesource.com/nest-learning-thermostat/5.9.4/x-loader
+* https://nest-open-source.googlesource.com/nest-learning-thermostat/5.9.4/u-boot
+* https://nest-open-source.googlesource.com/nest-learning-thermostat/5.9.4/linux
 * Linux 2.6.37
 * libc 2.19
 * gcc 4.8.2
@@ -48,13 +49,26 @@ make BR2_JLEVEL=16
 
 # Toolchain
 
-Use `toolchain/make.sh` to build a toolchain with crosstool-ng in docker.
+Latest ct-ng (1.28 at time of writing) can build GCC as old as 4.9.
+OEM nest image uses GCC 4.8, so I went back to ct-ng 1.22.
+
+The docker image is helpful to build a toolchain using an old ubunto release.
+How portable are these toolchain builds? I don't know, but they seem to work
+fine on my Arch system (your millage may vary).
+
+```console
+# Creates toolchain under ${OUTPUT_DIR}/arm-nest-linux-gnueabihf.
+# OUTPUT_DIR is optional, defaults to ${PWD}/build
+toolchain$ OUTPUT_DIR=~/Toolchains ./make.sh
+```
+
+## Using crosstool-ng
 
 ```console
 # Load configuration
-ct-ng defconfig DEFCONFIG=my-custom-config
+ct-ng defconfig DEFCONFIG=toolchain/toolchain_ct1.22_gcc4.8.config
 # Save configuration
-ct-ng savedefconfig DEFCONFIG=my-custom-config
+ct-ng savedefconfig DEFCONFIG=toolchain/toolchain_ct1.22_gcc4.8.config
 # Build and output to $TOOLCHAINS dir
 # CT_PREFIX_DIR="${TOOLCHAINS}/${CT_TARGET}"
 TOOLCHAINS=~/Toolchains ct-ng build
@@ -89,13 +103,13 @@ bootm 0x80A00000 0x82000000
 docker run -it --rm --user 1000:100 -v "$(pwd):/work" debian:11.11 bash
 
 # Build u-boot
-make ARCH=arm CROSS_COMPILE=arm-unknown-linux-gnueabi- distclean
-make ARCH=arm CROSS_COMPILE=arm-unknown-linux-gnueabi- diamond
-make ARCH=arm CROSS_COMPILE=arm-unknown-linux-gnueabi-
+make ARCH=arm CROSS_COMPILE=arm-nest-linux-gnueabihf- distclean
+make ARCH=arm CROSS_COMPILE=arm-nest-linux-gnueabihf- diamond
+make ARCH=arm CROSS_COMPILE=arm-nest-linux-gnueabihf-
 
 # Build linux
 make ARCH=arm distclean gtvhacker_defconfig
-make ARCH=arm CROSS_COMPILE=arm-unknown-linux-gnueabi- uImage
+make ARCH=arm CROSS_COMPILE=arm-nest-linux-gnueabihf- uImage
 ```
 
 # Dump and view rootfs from device flash
