@@ -1,3 +1,23 @@
+Build everything for Nest Gen 2 thermostat firmware from source.
+
+* Toolchain (crosstool-ng)
+* Bootloader from Nest source (u-boot, x-loader)
+* Linux kernel from Nest source
+* Userspace/rootfs (buildroot)
+
+Currently this produces builds that boot using DFU mode (i.e. without touching flash).
+Think of it like a bootable live environment.
+
+In theory, this can also be used to flash the kernel and root file system.
+I have not tested this, but it's on the TODO list.
+
+What's working:
+
+* Wifi driver works, but currently network manager doesn't work
+* USB ethernet (ssh from host over USB)
+* USB serial (serial terminal over USB)
+* Read/write u-boot environment variables
+
 # Nest OEM Details
 
 * https://nest-open-source.googlesource.com/nest-learning-thermostat/5.9.4/x-loader
@@ -88,12 +108,15 @@ TOOLCHAINS=~/Toolchains ct-ng build
 ./omap_loader \
    -f x-load.bin \
    -f u-boot.bin -a 0x80100000 \
-   -f buildroot-2026.02/output/images/uImage -a 0x80A00000 \
-   -f buildroot-2026.02/output/images/rootfs.cpio.uboot -a 0x82000000 \
+   -f ../buildroot-2026.02/output/images/uImage -a 0x80A00000 \
+   -f ../buildroot-2026.02/output/images/rootfs.cpio.uboot -a 0x82000000 \
    -v -j 0x80100000
 
 setenv bootargs console=ttyO0,115200 rdinit=/sbin/init nlmodel=Display-2.14
 bootm 0x80A00000 0x82000000
+
+# Getting early debug logs from kernel; helpful for diagnosing kernels crashes
+setenv bootargs earlyprintk=serial,ttyO0,115200 debug
 ```
 
 # Misc saved commands
