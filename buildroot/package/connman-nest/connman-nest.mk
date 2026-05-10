@@ -18,7 +18,9 @@ CONNMAN_NEST_CONF_OPTS += \
 	--disable-tools
 
 define CONNMAN_NEST_INSTALL_INIT_SYSV
-	$(INSTALL) -m 0755 -D package/connman/S45connman $(TARGET_DIR)/etc/init.d/S45connman
+	$(INSTALL) -m 0755 -D \
+		$(BR2_EXTERNAL_NEST_PATH)/package/connman-nest/S45connman \
+		$(TARGET_DIR)/etc/init.d/S45connman
 endef
 
 define CONNMAN_NEST_INSTALL_CM

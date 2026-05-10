@@ -13,9 +13,13 @@ I have not tested this, but it's on the TODO list.
 
 What's working:
 
-* Wifi driver works, but currently network manager doesn't work
-* USB ethernet (ssh from host over USB)
-* USB serial (serial terminal over USB)
+* USB serial
+   * Use serial terminal to get root shell (user "root", no password)
+* USB ethernet
+   * SSH from host to thermostat over USB (172.16.69.1)
+   * Requires root password set via serial connection first
+* Wifi
+   * Connection is not setup by default, use `connmanctl` to configure
 * Read/write u-boot environment variables
 
 # Nest OEM Details
