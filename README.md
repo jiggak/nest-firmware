@@ -137,6 +137,16 @@ make ARCH=arm CROSS_COMPILE=arm-nest-linux-gnueabihf-
 # Build linux
 make ARCH=arm distclean gtvhacker_defconfig
 make ARCH=arm CROSS_COMPILE=arm-nest-linux-gnueabihf- uImage
+
+# Several ways to enable debuging for wl12xx module
+echo 'module wl12xx +p' > /sys/kernel/debug/dynamic_debug/control
+echo 'module wl12xx_sdio +p' > /sys/kernel/debug/dynamic_debug/control
+echo 8 > /proc/sys/kernel/printk
+echo 0xFFFFFFFF > /sys/module/wl12xx/parameters/debug_level
+modprobe wl12xx debug_level=0xFFFFFFFF
+
+# extra kernel flags to add in u-boot for debugging kernel crash
+set bootargs earlyprintk=serial,ttyO0,115200 debug
 ```
 
 # Dump and view rootfs from device flash

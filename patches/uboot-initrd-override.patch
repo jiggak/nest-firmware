@@ -1,0 +1,105 @@
+diff --git a/u-boot/board/nest/diamond/diamond.c b/u-boot/board/nest/diamond/diamond.c
+index 89c009f..2b7ae23 100644
+--- a/u-boot/board/nest/diamond/diamond.c
++++ b/u-boot/board/nest/diamond/diamond.c
+@@ -148,8 +148,6 @@ void add_brightness(void);
+  * Global Variables
+  */
+ 
+-const char *bootdelay_identifier_key = "bootdelay";
+-
+ #if defined(CONFIG_DIAMOND_BOARD_MULTI)
+ static struct nlmodel model;
+ 
+@@ -897,8 +895,6 @@ int board_init(void)
+ int misc_init_r(void)
+ {
+ 	const char *serial;
+-	const char *bootdelay_str;
+-	int dirty = 0;
+ #if defined(CONFIG_PREBOOT) && defined(CONFIG_DFU)
+ 	char cmd[64] = { '\0' };
+ #endif /* defined(CONFIG_PREBOOT) && defined(CONFIG_DFU) */
+@@ -916,7 +912,6 @@ int misc_init_r(void)
+ 
+ 	if (identifier == NULL) {
+ 		setenv(nlmodel_identifier_key, DIAMOND_DEFAULT_MODEL_IDENTIFIER);
+-		dirty = 1;
+ 		identifier = nlmodel_identifier();
+ 	}
+ 
+@@ -1001,14 +996,14 @@ int misc_init_r(void)
+ #error "A specific Nest Diamond board type has not been configured!"
+ #endif /* defined(CONFIG_DIAMOND_BOARD_MULTI) */
+ 
+-	/* Fix bootdelay if necessary */
+-	bootdelay_str = getenv(bootdelay_identifier_key);
+-	if ( (bootdelay_str == NULL) || 
+-		 (strcmp(bootdelay_str, CONFIG_BOOTDELAY_STR) != 0) ) {
+-		setenv(bootdelay_identifier_key, CONFIG_BOOTDELAY_STR);
+-		dirty = 1;
+-	}
+-    
++	setenv("bootdelay", CONFIG_BOOTDELAY_STR);
++	setenv(
++		"bootcmd",
++		"setenv bootargs rdinit=/sbin/init && "
++			"run addtty addmodel && "
++			"bootm 0x80A00000 0x82000000"
++	);
++
+ 	if (diamond_model != NULL) {
+ 		if (diamond_model->mux_init) {
+ 			diamond_model->mux_init();
+@@ -1050,10 +1045,6 @@ int misc_init_r(void)
+ 
+ 	dieid_num_r();
+ 
+-	if (dirty) {
+-		saveenv();
+-	}
+-
+ #if defined(CONFIG_PREBOOT)
+ #if defined(CONFIG_DFU)
+ 	sprintf( cmd, "source 0x%08x", AUPD_LOAD_ADDRESS );
+diff --git a/u-boot/include/configs/diamond.h b/u-boot/include/configs/diamond.h
+index 7a9a3f4..454627f 100644
+--- a/u-boot/include/configs/diamond.h
++++ b/u-boot/include/configs/diamond.h
+@@ -546,11 +546,16 @@
+ 						   CONFIG_SYS_NANDBOOT1_ENV_SIZE,				\
+ 						   CONFIG_SYS_NANDBOOT1_ENV_DEV)
+ 
++#define CONFIG_SYS_DFUBOOT_ENV_SETTINGS									\
++	"dfuboot=setenv bootargs rdinit=/sbin/init && "						\
++		"run addtty addmodel && "										\
++		"bootm 0x80A00000 0x82000000\0"
++
+ /*
+  * The default boot command
+  */
+ #define CONFIG_BOOTCOMMAND												\
+-	"run nandboot0 || run nandboot1 || run mmcboot || reset"
++	"run dfuboot"
+ 
+ /*
+  * The alternate default boot command (see CONFIG_BOOTCOUNT_LIMIT)
+@@ -618,6 +623,7 @@
+ 	CONFIG_SYS_NANDBOOT1_ENV_SETTINGS									\
+ 	CONFIG_SYS_RESETENV_ENV_SETTINGS									\
+ 	CONFIG_SYS_SILENT													\
++	CONFIG_SYS_DFUBOOT_ENV_SETTINGS										\
+ 	""
+ 
+ /*
+@@ -643,8 +649,8 @@
+     #define CONFIG_BOOTDELAY				0
+     #define CONFIG_BOOTDELAY_STR            "0"
+ #else
+-    #define CONFIG_BOOTDELAY				1
+-    #define CONFIG_BOOTDELAY_STR            "1"
++    #define CONFIG_BOOTDELAY				3
++    #define CONFIG_BOOTDELAY_STR            "3"
+ #endif
+ 
+ 
