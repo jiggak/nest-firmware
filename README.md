@@ -147,6 +147,11 @@ modprobe wl12xx debug_level=0xFFFFFFFF
 
 # extra kernel flags to add in u-boot for debugging kernel crash
 set bootargs earlyprintk=serial,ttyO0,115200 debug
+
+# Replace boot logo
+pngtopnm -mix logo.png | \
+   ppmquant -fs 223 | \
+   pnmtoplainpnm > linux/linux/drivers/video/logo/logo_diamond_clut224.ppm
 ```
 
 # Dump and view rootfs from device flash
