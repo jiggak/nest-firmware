@@ -108,7 +108,7 @@ TOOLCHAINS=~/Toolchains ct-ng build
    -v -j 0x80100000
 
 # Boot with initrd, separate rootfs image
-# (fixes relocation errors loading modules; when initramfs grows large)
+# Using initramfs in kernel image results in relocation errors loading modules
 ./omap_loader \
    -f x-load.bin \
    -f u-boot.bin -a 0x80100000 \
@@ -116,11 +116,32 @@ TOOLCHAINS=~/Toolchains ct-ng build
    -f ../buildroot-2026.02/output/images/rootfs.cpio.uboot -a 0x82000000 \
    -v -j 0x80100000
 
+# u-boot commands to boot after running loader
 setenv bootargs console=ttyO0,115200 rdinit=/sbin/init nlmodel=Display-2.14
 bootm 0x80A00000 0x82000000
 
-# Getting early debug logs from kernel; helpful for diagnosing kernels crashes
-setenv bootargs earlyprintk=serial,ttyO0,115200 debug
+# Load kernel and rootfs image for flashing nand via u-boot
+./omap_loader \
+   -f x-load.bin \
+   -f u-boot.bin -a 0x80100000 \
+   -f ../buildroot-2026.02/output/images/uImage -a 0x80A00000 \
+   -f ../buildroot-2026.02/output/images/rootfs.jffs2 -a 0x82000000 \
+   -v -j 0x80100000
+
+# Get info of kernel image in u-boot
+iminfo 0x80A00000
+
+# nand write <address> <offset> <size>
+# These `nand write` commands write uImage and rootfs.jffs2 to boot1/root1 partitions
+# Boot with `run nandboot1` from u-boot prompt
+
+# size of uImage on disk: 1649680
+nand erase 0x03A00000 0x00800000
+nand write 0x80A00000 0x03A00000 0x192C10
+
+# size of rootfs.jffs2 on disk: 10022560
+nand erase 0x04200000 0x02E00000
+nand write 0x82000000 0x04200000 0x98EEA0
 ```
 
 # Misc saved commands
@@ -160,7 +181,7 @@ pngtopnm -mix logo.png | \
 # Host netcat to receive rootfs image
 nc -l -p 51234 >root.jffs2.bz2
 # Send rootfs image from device
-dd bs=1M if=/dev/mtd7ro | bzip2 -c | nc 192.168.1.10 51234
+dd bs=1M if=/dev/mtd7ro | bzip2 -c | nc 172.16.69.2 51234
 
 # Load modules for putting rootfs image in memory as block device
 modprobe mtdram total_size=65536 erase_size=128
