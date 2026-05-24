@@ -3,6 +3,10 @@ FROM ubuntu:14.04
 
 ARG CT_VERSION="1.22.0"
 
+ARG USERNAME=ubuntu
+ARG UID=1000
+ARG GID=1000
+
 RUN apt-get update && apt-get install -y \
    # core build tools
    gcc g++ make \
@@ -21,11 +25,18 @@ RUN mkdir /crosstool-ng && \
 
 # Include ct-ng in PATH
 ENV PATH "/crosstool-ng:$PATH"
+ENV TOOLCHAINS "/work"
 
-RUN useradd -u 1000 josh
-RUN mkdir /work && chown 1000:100 /work
+RUN mkdir /work
+
+RUN if [ "$UID" != "0" ]; then \
+   useradd -u ${UID} ${USERNAME} && \
+   chown ${UID}:${GID} /work; \
+fi
 
 WORKDIR /work
-USER 1000:100
+
+# non-root user required: ct-ng will error if run as root
+USER ${UID}:${GID}
 
 ENTRYPOINT ["ct-ng"]

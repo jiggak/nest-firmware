@@ -1,0 +1,47 @@
+name: Publish Toolchain Containers
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docker/**'
+      - '.github/workflows/publish-toolchain.yml'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_CT_NG_LEGACY: ${{ github.repository_owner }}/ct-ng-legacy
+  IMAGE_NEST_TOOLCHAIN: ${{ github.repository_owner }}/nest-toolchain
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push ct-ng-legacy
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/ct-ng-legacy
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_CT_NG_LEGACY }}:latest
+
+      - name: Build and push nest-toolchain
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/nest-toolchain
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NEST_TOOLCHAIN }}:latest
